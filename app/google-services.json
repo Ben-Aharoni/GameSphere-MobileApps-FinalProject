@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "545037158354",
+    "project_id": "gamesphere-df818",
+    "storage_bucket": "gamesphere-df818.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:545037158354:android:2cf788f0741873d8db2a0b",
+        "android_client_info": {
+          "package_name": "com.example.gamesphere_finalproject"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCwI9AzFJuigpjQkHfVaTM7WvnkEAiSITs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
