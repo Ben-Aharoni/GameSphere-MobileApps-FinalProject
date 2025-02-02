@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="@dimen/poster_width"
+        android:layout_height="@dimen/poster_height"
+        android:layout_marginVertical="@dimen/poster_margin"
+        android:layout_marginStart="@dimen/poster_margin"
+        android:elevation="@dimen/poster_elevation"
+        app:cardCornerRadius="@dimen/default_corner_radius"
+        app:cardElevation="@dimen/poster_elevation"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/game_CV_data"
+        app:layout_constraintStart_toStartOf="@id/game_CV_data"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/game_IMG_poster"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            app:srcCompat="@drawable/ic_launcher_background" />
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/game_CV_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/data_margin"
+        android:layout_marginStart="@dimen/data_start_margin"
+        android:layout_marginEnd="@dimen/data_margin"
+        android:elevation="@dimen/data_default_elevation"
+        app:cardCornerRadius="@dimen/default_corner_radius"
+        app:cardElevation="@dimen/data_default_elevation"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="@dimen/data_start_margin"
+            android:layout_marginEnd="@dimen/data_margin">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/game_IMG_favorite"
+                android:layout_width="@dimen/heart_dimension"
+                android:layout_height="@dimen/heart_dimension"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="@dimen/data_margin"
+                android:layout_marginEnd="@dimen/data_margin"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/empty_heart" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/game_LBL_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="@dimen/data_margin"
+                android:layout_marginTop="@dimen/data_margin"
+                android:layout_toStartOf="@id/game_IMG_favorite"
+                android:maxLines="2"
+                android:minLines="2"
+                android:textSize="@dimen/game_title_size"
+                android:textStyle="bold"
+                tools:text="Game Title" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/game_LBL_release_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/game_LBL_title"
+                android:layout_alignStart="@id/game_LBL_title"
+                android:layout_marginTop="@dimen/data_margin"
+                android:layout_marginEnd="@dimen/data_margin"
+                android:maxLines="1"
+                android:minLines="1"
+                android:textSize="@dimen/default_text_size"
+                tools:text="2025-01-01" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/game_LBL_genres"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/game_LBL_release_date"
+                android:layout_alignStart="@id/game_LBL_title"
+                android:layout_marginTop="@dimen/data_margin"
+                android:layout_marginEnd="@dimen/data_margin"
+                android:minLines="1"
+                android:maxLines="1"
+                android:textSize="@dimen/default_text_size"
+                tools:text="Action, Fantasy, Adventure, Sports..." />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/game_LBL_overview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/game_LBL_genres"
+                android:layout_alignStart="@id/game_LBL_title"
+                android:layout_marginTop="@dimen/data_margin"
+                android:layout_marginEnd="@dimen/data_margin"
+                android:minLines="1"
+                android:maxLines="3"
+                android:textSize="@dimen/default_text_size"
+                tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vel dolor auctor, bibendum lectus sit amet, bibendum velit. Nunc euismod, odio eget eleifend aliquet, nibh nibh malesuada risus, vel pretium nunc eros at elit. Donec finibus ultrices quam a luctus. Curabitur lobortis massa id sapien aliquam, id congue mi lobortis. Fusce id aliquam ante. Nullam congue velit ac bibendum eleifend. Nulla quis gravida odio, vel rutrum risus. Ut tincidunt, justo in fermentum bibendum, mauris mauris malesuada metus, ut eleifend augue lectus ut ex. Nam ut mollis ante." />
+
+
+            <androidx.appcompat.widget.AppCompatRatingBar
+                android:id="@+id/game_RB_rating"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/game_LBL_overview"
+                android:layout_centerHorizontal="true"
+                android:layout_marginVertical="@dimen/data_margin"
+                android:progressTint="@color/rating_first"
+                android:secondaryProgressTint="@color/rating_second"
+                android:stepSize="1"
+                tools:rating="3.7"
+                android:isIndicator="true"
+                />
+
+        </RelativeLayout>
+    </androidx.cardview.widget.CardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

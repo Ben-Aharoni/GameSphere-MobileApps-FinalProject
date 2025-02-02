@@ -11,4 +11,6 @@
     <color name="blue_300">#64B5F6</color>
     <color name="teal_300">#4DB6AC</color>
     <color name="grey_300">#545958</color>
+    <color name="rating_first">#FFEE58</color>
+    <color name="rating_second">#FFA726</color>
 </resources>
