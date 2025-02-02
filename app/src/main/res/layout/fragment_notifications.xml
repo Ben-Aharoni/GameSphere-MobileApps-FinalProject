@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layoutDirection="ltr"
     tools:context=".ui.notifications.NotificationsFragment">
 
     <TextView
@@ -26,6 +27,7 @@
         android:layout_height="match_parent"
         android:layout_margin="@dimen/default_margin"
         tools:listitem="@layout/game_item"
+
 
         />
 </androidx.constraintlayout.widget.ConstraintLayout>

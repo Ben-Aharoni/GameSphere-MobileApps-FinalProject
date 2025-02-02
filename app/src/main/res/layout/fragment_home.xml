@@ -29,7 +29,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="@dimen/default_margin"
-        android:layout_marginStart="@dimen/default_margin"/>
+        android:layout_marginStart="@dimen/sign_out_start_margin"
+        android:backgroundTint="@color/grey"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

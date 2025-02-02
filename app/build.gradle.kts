@@ -62,4 +62,7 @@ dependencies {
     //Firebase Auth-ui
     implementation(libs.firebase.auth)
     implementation (libs.firebase.ui.auth)
+
+    //glide
+    implementation(libs.glide)
 }
