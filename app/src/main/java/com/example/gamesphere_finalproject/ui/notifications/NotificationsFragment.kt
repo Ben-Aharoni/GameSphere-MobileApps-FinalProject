@@ -34,7 +34,7 @@ class NotificationsFragment : Fragment() {
         val gameList = DataManager.generateGameList()
 
         // Initialize the GameAdapter with the game list
-        val gameAdapter = GameAdapter(gameList)
+        val gameAdapter = GameAdapter(gameList, requireContext())
 
         // Set the adapter to the RecyclerView
         binding.mainRVList.adapter = gameAdapter

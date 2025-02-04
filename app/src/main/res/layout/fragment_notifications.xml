@@ -26,8 +26,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="@dimen/default_margin"
-        tools:listitem="@layout/game_item"
+        tools:listitem="@layout/game_item" />
 
-
-        />
 </androidx.constraintlayout.widget.ConstraintLayout>

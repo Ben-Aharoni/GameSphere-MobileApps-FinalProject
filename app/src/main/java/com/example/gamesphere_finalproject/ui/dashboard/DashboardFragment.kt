@@ -7,14 +7,14 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.gamesphere_finalproject.adapters.EventAdapter
 import com.example.gamesphere_finalproject.databinding.FragmentDashboardBinding
+import com.example.gamesphere_finalproject.models.EventDataManager
 
 class DashboardFragment : Fragment() {
 
     private var _binding: FragmentDashboardBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
 
     override fun onCreateView(
@@ -22,17 +22,24 @@ class DashboardFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val dashboardViewModel =
-            ViewModelProvider(this).get(DashboardViewModel::class.java)
-
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
-        val root: View = binding.root
+        return binding.root
+    }
 
-        val textView: TextView = binding.textDashboard
-        dashboardViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
-        }
-        return root
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // Set up the RecyclerView with a LinearLayoutManager
+        binding.mainRVList.layoutManager = LinearLayoutManager(requireContext())
+
+        // Retrieve the event list from EventDataManager in the models package
+        val eventList = EventDataManager.generateEventList()
+
+        // Initialize the EventAdapter with the event list
+        val eventAdapter = EventAdapter(eventList, requireContext())
+
+        // Set the adapter to the RecyclerView
+        binding.mainRVList.adapter = eventAdapter
     }
 
     override fun onDestroyView() {
