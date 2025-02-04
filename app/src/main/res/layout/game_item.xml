@@ -30,7 +30,7 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/game_CV_data"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginVertical="@dimen/data_margin"
         android:layout_marginStart="@dimen/data_start_margin"
         android:layout_marginEnd="@dimen/data_margin"
@@ -43,7 +43,7 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/data_start_margin"
             android:layout_marginEnd="@dimen/data_margin"
             >
@@ -125,8 +125,8 @@
                 android:secondaryProgressTint="@color/rating_second"
                 android:stepSize="1"
                 tools:rating="3.7"
-                android:isIndicator="true"
-                />
+                style="?android:attr/ratingBarStyleSmall"
+                android:isIndicator="true" />
 
         </RelativeLayout>
     </androidx.cardview.widget.CardView>

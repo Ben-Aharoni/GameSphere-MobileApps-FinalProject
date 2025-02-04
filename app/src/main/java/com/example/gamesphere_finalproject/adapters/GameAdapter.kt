@@ -38,8 +38,7 @@ class GameAdapter(private val games: List<Game>, private val context: Context) :
         with(holder) {
             with(getItem(position)) {
                 binding.gameLBLTitle.text = name
-                binding.gameLBLReleaseDate.text =
-                    releaseDate.format(DateTimeFormatter.ofPattern("dd-MMM-yyyy"))
+                binding.gameLBLReleaseDate.text = releaseDate.format(DateTimeFormatter.ofPattern("dd-MMM-yyyy"))
                 binding.gameLBLGenres.text = genre.joinToString(", ")
                 binding.gameLBLOverview.text = overview
                 binding.gameRBRating.rating = rating / 2

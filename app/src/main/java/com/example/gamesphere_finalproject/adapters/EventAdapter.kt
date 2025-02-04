@@ -38,8 +38,7 @@ class EventAdapter(private val events: List<Event>, private val context: Context
         with(holder) {
             with(getItem(position)) {
                 binding.eventLBLTitle.text = name
-                binding.eventLBLReleaseDate.text =
-                    releaseDate.format(DateTimeFormatter.ofPattern("dd-MMM-yyyy"))
+                binding.eventLBLReleaseDate.text = releaseDate.format(DateTimeFormatter.ofPattern("dd-MMM-yyyy"))
                 binding.eventLBLGenres.text = genre.joinToString(", ")
                 binding.eventLBLOverview.text = overview
                 binding.eventLBLLocation.text = location
