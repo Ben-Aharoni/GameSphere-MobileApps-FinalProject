@@ -63,6 +63,11 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation (libs.firebase.ui.auth)
 
+    //Firebase real-time database
+    implementation(libs.firebase.database)
+
     //glide
     implementation(libs.glide)
+
+    implementation (libs.circleimageview)
 }

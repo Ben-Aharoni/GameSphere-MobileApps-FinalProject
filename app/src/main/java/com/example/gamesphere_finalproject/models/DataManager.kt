@@ -3,7 +3,7 @@ package com.example.gamesphere_finalproject.models
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-object DataManager {
+/*object DataManager {
     fun generateGameList(): List<Game> {
         val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
         val games = mutableListOf<Game>()
@@ -259,7 +259,9 @@ object DataManager {
                 .isFavorite(false)
                 .build()
         )
+
+
         return games
     }
 
-}
+}*/

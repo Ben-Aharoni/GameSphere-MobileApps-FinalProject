@@ -3,7 +3,7 @@ package com.example.gamesphere_finalproject.models
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-object EventDataManager {
+/*object EventDataManager {
     fun generateEventList(): List<Event> {
         val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
         val events = mutableListOf<Event>()
@@ -128,6 +128,7 @@ object EventDataManager {
                 .build()
         )
 
+
         return events
     }
-}
+}*/

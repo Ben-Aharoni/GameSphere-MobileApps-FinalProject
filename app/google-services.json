@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "545037158354",
+    "firebase_url": "https://gamesphere-df818-default-rtdb.firebaseio.com",
     "project_id": "gamesphere-df818",
     "storage_bucket": "gamesphere-df818.firebasestorage.app"
   },

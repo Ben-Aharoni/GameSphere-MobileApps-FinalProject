@@ -15,4 +15,6 @@
     <dimen name="game_title_size">18sp</dimen>
     <dimen name="default_text_size">11sp</dimen>
     <dimen name="sign_out_start_margin">5dp</dimen>
+    <dimen name="RV_margin">5dp</dimen>
+    <dimen name="RV_padding_bottom">100dp</dimen>
 </resources>
