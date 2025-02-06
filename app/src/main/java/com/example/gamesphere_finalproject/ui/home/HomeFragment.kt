@@ -78,56 +78,39 @@ class HomeFragment : Fragment() {
     private fun loadFavorites() {
         val userId = auth.currentUser?.uid ?: return
 
-        favoriteItems.clear() // Clear previous data
+        favoriteItems.clear()
 
-        // Fetch Favorite Games
-        database.child("users").child(userId).child("favoriteGames")
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    for (gameSnapshot in snapshot.children) {
-                        val gameId = gameSnapshot.key ?: continue
-                        database.child("games").child(gameId) // Fetch full game details
-                            .addListenerForSingleValueEvent(object : ValueEventListener {
-                                override fun onDataChange(gameDetailSnapshot: DataSnapshot) {
-                                    val game = gameDetailSnapshot.getValue(Game::class.java)
-                                    if (game != null) {
-                                        favoriteItems.add(FavoriteItem.GameItem(game))
-                                        favoriteAdapter.notifyDataSetChanged()
-                                    }
-                                }
-
-                                override fun onCancelled(error: DatabaseError) {}
-                            })
+        // 🔹 Load favorite games (full objects)
+        database.child("users").child(userId).child("favoriteGames").addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                for (gameSnapshot in snapshot.children) {
+                    val game = gameSnapshot.getValue(Game::class.java) // ✅ Get full game object
+                    if (game != null) {
+                        favoriteItems.add(FavoriteItem.GameItem(game)) // ✅ Store full object
                     }
                 }
+                favoriteAdapter.notifyDataSetChanged()
+            }
+            override fun onCancelled(error: DatabaseError) {}
+        })
 
-                override fun onCancelled(error: DatabaseError) {}
-            })
-
-        // Fetch Favorite Events
-        database.child("users").child(userId).child("favoriteEvents")
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    for (eventSnapshot in snapshot.children) {
-                        val eventId = eventSnapshot.key ?: continue
-                        database.child("events").child(eventId) // Fetch full event details
-                            .addListenerForSingleValueEvent(object : ValueEventListener {
-                                override fun onDataChange(eventDetailSnapshot: DataSnapshot) {
-                                    val event = eventDetailSnapshot.getValue(Event::class.java)
-                                    if (event != null) {
-                                        favoriteItems.add(FavoriteItem.EventItem(event))
-                                        favoriteAdapter.notifyDataSetChanged()
-                                    }
-                                }
-
-                                override fun onCancelled(error: DatabaseError) {}
-                            })
+        // 🔹 Load favorite events (full objects)
+        database.child("users").child(userId).child("favoriteEvents").addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                for (eventSnapshot in snapshot.children) {
+                    val event = eventSnapshot.getValue(Event::class.java) // ✅ Get full event object
+                    if (event != null) {
+                        favoriteItems.add(FavoriteItem.EventItem(event)) // ✅ Store full object
                     }
                 }
-
-                override fun onCancelled(error: DatabaseError) {}
-            })
+                favoriteAdapter.notifyDataSetChanged()
+            }
+            override fun onCancelled(error: DatabaseError) {}
+        })
     }
+
+
+
 
     private fun signOutUser() {
         auth.signOut()

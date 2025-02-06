@@ -61,20 +61,22 @@ class LoginActivity : AppCompatActivity() {
         val user = FirebaseAuth.getInstance().currentUser
 
         if (user != null) {
-            val userId = user.uid
+            val username = user.displayName ?: user.email?.substringBefore("@") ?: "Unknown User"
+
             val userData = mapOf(
-                "userId" to userId,
+                "userId" to user.uid,
                 "email" to user.email,
-                "username" to (user.displayName ?: user.email?.substringBefore("@")),
+                "username" to username, // ✅ Ensure username is stored
                 "profilePicUrl" to (user.photoUrl?.toString() ?: "https://www.example.com/default-profile.png"),
-                "favoriteGames" to mapOf<String, Boolean>(),  // 🔹 Empty Map to Store Favorites
-                "favoriteEvents" to mapOf<String, Boolean>()  // 🔹 Empty Map to Store Favorites
+                "favoriteGames" to emptyMap<String, Boolean>(),
+                "favoriteEvents" to emptyMap<String, Boolean>()
             )
 
-            database.child("users").child(userId).get().addOnSuccessListener { snapshot ->
+            database.child("users").child(user.uid).get().addOnSuccessListener { snapshot ->
                 if (!snapshot.exists()) {
-                    database.child("users").child(userId).setValue(userData)
+                    database.child("users").child(user.uid).setValue(userData)
                         .addOnSuccessListener {
+                            Toast.makeText(this, "User registered!", Toast.LENGTH_SHORT).show()
                             transactToNextScreen()
                         }
                         .addOnFailureListener {
@@ -88,6 +90,7 @@ class LoginActivity : AppCompatActivity() {
             }
         }
     }
+
 
     private fun transactToNextScreen() {
         intent = Intent(this, MainActivity::class.java)

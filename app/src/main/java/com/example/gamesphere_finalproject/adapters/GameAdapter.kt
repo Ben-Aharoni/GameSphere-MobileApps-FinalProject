@@ -32,151 +32,98 @@ class GameAdapter(private val games: List<Game>, private val context: Context) :
     fun getItem(position: Int) = games[position]
 
     override fun onBindViewHolder(holder: GameViewHolder, position: Int) {
-        with(holder) {
-            with(getItem(position)) {
-                binding.gameLBLTitle.text = name
-                binding.gameLBLReleaseDate.text = releaseDate.format(DateTimeFormatter.ofPattern("dd-MMM-yyyy"))
-                binding.gameLBLGenres.text = genre.joinToString(", ")
-                binding.gameLBLOverview.text = overview
-                binding.gameRBRating.rating = rating / 2
-                ImageLoader.getInstance().loadImage(poster, binding.gameIMGPoster)
+        val game = getItem(position)
 
-                // 🔹 Fetch favorite state from Firebase
-                fetchFavoriteState(name) { isFav ->
-                    isFavorite = isFav
-                    updateFavoriteIcon(isFavorite)
-                }
-
-                // 🔹 Expand/collapse animation
-                binding.gameCVData.setOnClickListener {
-                    val animatorSet = ArrayList<ObjectAnimator>()
-
-                    if (isCollapsed) {
-                        animatorSet.add(
-                            ObjectAnimator.ofInt(
-                                binding.gameLBLOverview, "maxLines",
-                                binding.gameLBLOverview.lineCount
-                            ).setDuration(
-                                (max(
-                                    (binding.gameLBLOverview.lineCount - Constants.Data.OVERVIEW_MIN_LINES).toDouble(),
-                                    0.0
-                                ) * 50L).toLong()
-                            )
-                        )
-                        animatorSet.add(
-                            ObjectAnimator.ofInt(
-                                binding.gameLBLGenres, "maxLines",
-                                binding.gameLBLGenres.lineCount
-                            ).setDuration(
-                                (max(
-                                    (binding.gameLBLGenres.lineCount - Constants.Data.GENRES_MIN_LINES).toDouble(),
-                                    0.0
-                                ) * 50L).toLong()
-                            )
-                        )
-                        animatorSet.add(
-                            ObjectAnimator.ofInt(
-                                binding.gameLBLTitle, "maxLines",
-                                binding.gameLBLTitle.lineCount
-                            ).setDuration(
-                                (max(
-                                    (binding.gameLBLTitle.lineCount - Constants.Data.GENRES_MIN_LINES).toDouble(),
-                                    0.0
-                                ) * 50L).toLong()
-                            )
-                        )
-
-                    } else {
-                        animatorSet.add(
-                            ObjectAnimator.ofInt(
-                                binding.gameLBLOverview, "maxLines",
-                                Constants.Data.OVERVIEW_MIN_LINES
-                            ).setDuration(
-                                (max(
-                                    (binding.gameLBLOverview.lineCount - Constants.Data.OVERVIEW_MIN_LINES).toDouble(),
-                                    0.0
-                                ) * 50L).toLong()
-                            )
-                        )
-                        animatorSet.add(
-                            ObjectAnimator.ofInt(
-                                binding.gameLBLGenres, "maxLines",
-                                Constants.Data.GENRES_MIN_LINES
-                            ).setDuration(
-                                (max(
-                                    (binding.gameLBLGenres.lineCount - Constants.Data.GENRES_MIN_LINES).toDouble(),
-                                    0.0
-                                ) * 50L).toLong()
-                            )
-                        )
-                        animatorSet.add(
-                            ObjectAnimator.ofInt(
-                                binding.gameLBLTitle, "maxLines",
-                                Constants.Data.GENRES_MIN_LINES
-                            ).setDuration(
-                                (max(
-                                    (binding.gameLBLTitle.lineCount - Constants.Data.GENRES_MIN_LINES).toDouble(),
-                                    0.0
-                                ) * 50L).toLong()
-                            )
-                        )
-                    }
-
-                    toggleCollapse()
-                    animatorSet.forEach { it.start() }
-                }
-            }
+        // Fetch full game object if it's in favorites
+        fetchFavoriteGame(game.name) { fetchedGame ->
+            val displayGame = fetchedGame ?: game  // Use full object if found, else use local
+            holder.bind(displayGame)
         }
     }
 
     inner class GameViewHolder(val binding: GameItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        init {
+        fun bind(game: Game) {
+            binding.gameLBLTitle.text = game.name
+            binding.gameLBLReleaseDate.text = game.releaseDate
+            binding.gameLBLGenres.text = game.genre.joinToString(", ")
+            binding.gameLBLOverview.text = game.overview
+            binding.gameRBRating.rating = game.rating / 2
+            ImageLoader.getInstance().loadImage(game.poster, binding.gameIMGPoster)
+
+            // Fetch and update favorite state
+            fetchFavoriteGame(game.name) { favoriteGame ->
+                game.isFavorite = favoriteGame != null
+                updateFavoriteIcon(game.isFavorite)
+            }
+
+            // Expand/collapse animation
+            binding.gameCVData.setOnClickListener {
+                toggleExpandCollapse(game)
+            }
+
+            // Favorite button click listener
             binding.gameIMGFavorite.setOnClickListener {
-                val game = getItem(adapterPosition)
-                game.isFavorite = !game.isFavorite // Toggle favorite state
-
-                // 🔹 Save favorite state in Firebase
-                updateFavoriteState(game.name, game.isFavorite)
-
-                // 🔹 Update UI
+                game.isFavorite = !game.isFavorite
+                updateFavoriteState(game, game.isFavorite)
                 updateFavoriteIcon(game.isFavorite)
                 notifyItemChanged(adapterPosition)
-
-                // 🔹 Call callback if needed
                 gameCallback?.favoriteButtonClicked(game, adapterPosition)
             }
         }
-    }
 
-    // 🔹 Helper function to update the favorite icon
-    private fun GameViewHolder.updateFavoriteIcon(isFavorite: Boolean) {
-        binding.gameIMGFavorite.setImageResource(
-            if (isFavorite) R.drawable.heart else R.drawable.empty_heart
-        )
-    }
+        private fun updateFavoriteIcon(isFavorite: Boolean) {
+            binding.gameIMGFavorite.setImageResource(
+                if (isFavorite) R.drawable.heart else R.drawable.empty_heart
+            )
+        }
 
-    // 🔹 Function to save favorite state in Firebase
-    private fun updateFavoriteState(gameName: String, isFavorite: Boolean) {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        val gameRef = database.child("users").child(userId).child("favoriteGames").child(gameName)
+        private fun toggleExpandCollapse(game: Game) {
+            val animatorSet = ArrayList<ObjectAnimator>()
 
-        if (isFavorite) {
-            gameRef.setValue(true) // ✅ Add to Firebase
-        } else {
-            gameRef.removeValue() // ✅ Remove from Firebase
+            if (game.isCollapsed) {
+                animatorSet.add(ObjectAnimator.ofInt(binding.gameLBLOverview, "maxLines", binding.gameLBLOverview.lineCount)
+                    .setDuration((max((binding.gameLBLOverview.lineCount - Constants.Data.OVERVIEW_MIN_LINES).toDouble(), 0.0) * 50L).toLong()))
+                animatorSet.add(ObjectAnimator.ofInt(binding.gameLBLGenres, "maxLines", binding.gameLBLGenres.lineCount)
+                    .setDuration((max((binding.gameLBLGenres.lineCount - Constants.Data.GENRES_MIN_LINES).toDouble(), 0.0) * 50L).toLong()))
+                animatorSet.add(ObjectAnimator.ofInt(binding.gameLBLTitle, "maxLines", binding.gameLBLTitle.lineCount)
+                    .setDuration((max((binding.gameLBLTitle.lineCount - Constants.Data.GENRES_MIN_LINES).toDouble(), 0.0) * 50L).toLong()))
+            } else {
+                animatorSet.add(ObjectAnimator.ofInt(binding.gameLBLOverview, "maxLines", Constants.Data.OVERVIEW_MIN_LINES)
+                    .setDuration((max((binding.gameLBLOverview.lineCount - Constants.Data.OVERVIEW_MIN_LINES).toDouble(), 0.0) * 50L).toLong()))
+                animatorSet.add(ObjectAnimator.ofInt(binding.gameLBLGenres, "maxLines", Constants.Data.GENRES_MIN_LINES)
+                    .setDuration((max((binding.gameLBLGenres.lineCount - Constants.Data.GENRES_MIN_LINES).toDouble(), 0.0) * 50L).toLong()))
+                animatorSet.add(ObjectAnimator.ofInt(binding.gameLBLTitle, "maxLines", Constants.Data.GENRES_MIN_LINES)
+                    .setDuration((max((binding.gameLBLTitle.lineCount - Constants.Data.GENRES_MIN_LINES).toDouble(), 0.0) * 50L).toLong()))
+            }
+
+            game.isCollapsed = !game.isCollapsed
+            animatorSet.forEach { it.start() }
         }
     }
 
-    // 🔹 Function to fetch favorite state from Firebase
-    private fun fetchFavoriteState(gameName: String, callback: (Boolean) -> Unit) {
+    // 🔹 Store or remove full game object in Firebase
+    private fun updateFavoriteState(game: Game, isFavorite: Boolean) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val gameRef = database.child("users").child(userId).child("favoriteGames").child(game.name)
+
+        if (isFavorite) {
+            gameRef.setValue(game) // ✅ Save full object
+        } else {
+            gameRef.removeValue() // ❌ Remove game object if unliked
+        }
+    }
+
+    // 🔹 Fetch full game object from Firebase
+    private fun fetchFavoriteGame(gameName: String, callback: (Game?) -> Unit) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val gameRef = database.child("users").child(userId).child("favoriteGames").child(gameName)
 
         gameRef.get().addOnSuccessListener { snapshot ->
-            callback(snapshot.exists()) // ✅ Returns true if game exists in Firebase
+            val game = snapshot.getValue(Game::class.java)
+            callback(game)
         }.addOnFailureListener {
-            callback(false) // ✅ If there's an error, return false
+            callback(null)
         }
     }
 }

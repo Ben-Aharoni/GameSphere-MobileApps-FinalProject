@@ -32,173 +32,102 @@ class EventAdapter(private val events: List<Event>, private val context: Context
     fun getItem(position: Int) = events[position]
 
     override fun onBindViewHolder(holder: EventViewHolder, position: Int) {
-        with(holder) {
-            with(getItem(position)) {
-                binding.eventLBLTitle.text = name
-                binding.eventLBLReleaseDate.text = releaseDate.format(DateTimeFormatter.ofPattern("dd-MMM-yyyy"))
-                binding.eventLBLGenres.text = genre.joinToString(", ")
-                binding.eventLBLOverview.text = overview
-                binding.eventLBLLocation.text = location
-                ImageLoader.getInstance().loadImage(poster, binding.eventIMGPoster)
+        val event = getItem(position)
 
-                // 🔹 Fetch favorite state from Firebase
-                fetchFavoriteState(name) { isFav ->
-                    isFavorite = isFav
-                    updateFavoriteIcon(isFavorite)
-                }
-
-                // 🔹 Expand/collapse animation
-                binding.eventCVData.setOnClickListener {
-                    val animatorSet = ArrayList<ObjectAnimator>()
-
-                    if (isCollapsed) {
-                        animatorSet.add(
-                            ObjectAnimator.ofInt(
-                                binding.eventLBLOverview, "maxLines",
-                                binding.eventLBLOverview.lineCount
-                            ).setDuration(
-                                (max(
-                                    (binding.eventLBLOverview.lineCount - Constants.Data.OVERVIEW_MIN_LINES).toDouble(),
-                                    0.0
-                                ) * 50L).toLong()
-                            )
-                        )
-                        animatorSet.add(
-                            ObjectAnimator.ofInt(
-                                binding.eventLBLGenres, "maxLines",
-                                binding.eventLBLGenres.lineCount
-                            ).setDuration(
-                                (max(
-                                    (binding.eventLBLGenres.lineCount - Constants.Data.GENRES_MIN_LINES).toDouble(),
-                                    0.0
-                                ) * 50L).toLong()
-                            )
-                        )
-                        animatorSet.add(
-                            ObjectAnimator.ofInt(
-                                binding.eventLBLTitle, "maxLines",
-                                binding.eventLBLTitle.lineCount
-                            ).setDuration(
-                                (max(
-                                    (binding.eventLBLTitle.lineCount - Constants.Data.GENRES_MIN_LINES).toDouble(),
-                                    0.0
-                                ) * 50L).toLong()
-                            )
-                        )
-                        animatorSet.add(
-                            ObjectAnimator.ofInt(
-                                binding.eventLBLLocation, "maxLines",
-                                binding.eventLBLLocation.lineCount
-                            ).setDuration(
-                                (max(
-                                    (binding.eventLBLLocation.lineCount - Constants.Data.GENRES_MIN_LINES).toDouble(),
-                                    0.0
-                                ) * 50L).toLong()
-                            )
-                        )
-
-                    } else {
-                        animatorSet.add(
-                            ObjectAnimator.ofInt(
-                                binding.eventLBLOverview, "maxLines",
-                                Constants.Data.OVERVIEW_MIN_LINES
-                            ).setDuration(
-                                (max(
-                                    (binding.eventLBLOverview.lineCount - Constants.Data.OVERVIEW_MIN_LINES).toDouble(),
-                                    0.0
-                                ) * 50L).toLong()
-                            )
-                        )
-                        animatorSet.add(
-                            ObjectAnimator.ofInt(
-                                binding.eventLBLGenres, "maxLines",
-                                Constants.Data.GENRES_MIN_LINES
-                            ).setDuration(
-                                (max(
-                                    (binding.eventLBLGenres.lineCount - Constants.Data.GENRES_MIN_LINES).toDouble(),
-                                    0.0
-                                ) * 50L).toLong()
-                            )
-                        )
-                        animatorSet.add(
-                            ObjectAnimator.ofInt(
-                                binding.eventLBLTitle, "maxLines",
-                                Constants.Data.GENRES_MIN_LINES
-                            ).setDuration(
-                                (max(
-                                    (binding.eventLBLTitle.lineCount - Constants.Data.GENRES_MIN_LINES).toDouble(),
-                                    0.0
-                                ) * 50L).toLong()
-                            )
-                        )
-                        animatorSet.add(
-                            ObjectAnimator.ofInt(
-                                binding.eventLBLLocation, "maxLines",
-                                Constants.Data.GENRES_MIN_LINES
-                            ).setDuration(
-                                (max(
-                                    (binding.eventLBLLocation.lineCount - Constants.Data.GENRES_MIN_LINES).toDouble(),
-                                    0.0
-                                ) * 50L).toLong()
-                            )
-                        )
-                    }
-
-                    toggleCollapse()
-                    animatorSet.forEach { it.start() }
-                }
-            }
+        // Fetch full event object if it's in favorites
+        fetchFavoriteEvent(event.name) { fetchedEvent ->
+            val displayEvent = fetchedEvent ?: event  // Use full object if found, else use local
+            holder.bind(displayEvent)
         }
     }
 
     inner class EventViewHolder(val binding: EventItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        init {
+        fun bind(event: Event) {
+            binding.eventLBLTitle.text = event.name
+            binding.eventLBLReleaseDate.text = event.releaseDate
+            binding.eventLBLGenres.text = event.genre.joinToString(", ")
+            binding.eventLBLOverview.text = event.overview
+            binding.eventLBLLocation.text = event.location
+            ImageLoader.getInstance().loadImage(event.poster, binding.eventIMGPoster)
+
+            // Fetch and update favorite state
+            fetchFavoriteEvent(event.name) { favoriteEvent ->
+                event.isFavorite = favoriteEvent != null
+                updateFavoriteIcon(event.isFavorite)
+            }
+
+            // Expand/collapse animation
+            binding.eventCVData.setOnClickListener {
+                toggleExpandCollapse(event)
+            }
+
+            // Favorite button click listener
             binding.eventIMGFavorite.setOnClickListener {
-                val event = getItem(adapterPosition)
-                event.isFavorite = !event.isFavorite // Toggle favorite state
-
-                // 🔹 Save favorite state in Firebase
-                updateFavoriteState(event.name, event.isFavorite)
-
-                // 🔹 Update UI
+                event.isFavorite = !event.isFavorite
+                updateFavoriteState(event, event.isFavorite)
                 updateFavoriteIcon(event.isFavorite)
                 notifyItemChanged(adapterPosition)
-
-                // 🔹 Call callback if needed
                 eventCallback?.favoriteButtonClicked(event, adapterPosition)
             }
         }
-    }
 
-    // 🔹 Helper function to update the favorite icon
-    private fun EventViewHolder.updateFavoriteIcon(isFavorite: Boolean) {
-        binding.eventIMGFavorite.setImageResource(
-            if (isFavorite) R.drawable.heart else R.drawable.empty_heart
-        )
-    }
+        private fun updateFavoriteIcon(isFavorite: Boolean) {
+            binding.eventIMGFavorite.setImageResource(
+                if (isFavorite) R.drawable.heart else R.drawable.empty_heart
+            )
+        }
 
-    // 🔹 Function to save favorite state in Firebase
-    private fun updateFavoriteState(eventName: String, isFavorite: Boolean) {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        val eventRef = database.child("users").child(userId).child("favoriteEvents").child(eventName)
+        private fun toggleExpandCollapse(event: Event) {
+            val animatorSet = ArrayList<ObjectAnimator>()
 
-        if (isFavorite) {
-            eventRef.setValue(true) // ✅ Add to Firebase
-        } else {
-            eventRef.removeValue() // ✅ Remove from Firebase
+            if (event.isCollapsed) {
+                animatorSet.add(ObjectAnimator.ofInt(binding.eventLBLOverview, "maxLines", binding.eventLBLOverview.lineCount)
+                    .setDuration((max((binding.eventLBLOverview.lineCount - Constants.Data.OVERVIEW_MIN_LINES).toDouble(), 0.0) * 50L).toLong()))
+                animatorSet.add(ObjectAnimator.ofInt(binding.eventLBLGenres, "maxLines", binding.eventLBLGenres.lineCount)
+                    .setDuration((max((binding.eventLBLGenres.lineCount - Constants.Data.GENRES_MIN_LINES).toDouble(), 0.0) * 50L).toLong()))
+                animatorSet.add(ObjectAnimator.ofInt(binding.eventLBLTitle, "maxLines", binding.eventLBLTitle.lineCount)
+                    .setDuration((max((binding.eventLBLTitle.lineCount - Constants.Data.GENRES_MIN_LINES).toDouble(), 0.0) * 50L).toLong()))
+                animatorSet.add(ObjectAnimator.ofInt(binding.eventLBLLocation, "maxLines", binding.eventLBLLocation.lineCount)
+                    .setDuration((max((binding.eventLBLLocation.lineCount - Constants.Data.GENRES_MIN_LINES).toDouble(), 0.0) * 50L).toLong()))
+            } else {
+                animatorSet.add(ObjectAnimator.ofInt(binding.eventLBLOverview, "maxLines", Constants.Data.OVERVIEW_MIN_LINES)
+                    .setDuration((max((binding.eventLBLOverview.lineCount - Constants.Data.OVERVIEW_MIN_LINES).toDouble(), 0.0) * 50L).toLong()))
+                animatorSet.add(ObjectAnimator.ofInt(binding.eventLBLGenres, "maxLines", Constants.Data.GENRES_MIN_LINES)
+                    .setDuration((max((binding.eventLBLGenres.lineCount - Constants.Data.GENRES_MIN_LINES).toDouble(), 0.0) * 50L).toLong()))
+                animatorSet.add(ObjectAnimator.ofInt(binding.eventLBLTitle, "maxLines", Constants.Data.GENRES_MIN_LINES)
+                    .setDuration((max((binding.eventLBLTitle.lineCount - Constants.Data.GENRES_MIN_LINES).toDouble(), 0.0) * 50L).toLong()))
+                animatorSet.add(ObjectAnimator.ofInt(binding.eventLBLLocation, "maxLines", Constants.Data.GENRES_MIN_LINES)
+                    .setDuration((max((binding.eventLBLLocation.lineCount - Constants.Data.GENRES_MIN_LINES).toDouble(), 0.0) * 50L).toLong()))
+            }
+
+            event.isCollapsed = !event.isCollapsed
+            animatorSet.forEach { it.start() }
         }
     }
 
-    // 🔹 Function to fetch favorite state from Firebase
-    private fun fetchFavoriteState(eventName: String, callback: (Boolean) -> Unit) {
+    // 🔹 Store or remove full event object in Firebase
+    private fun updateFavoriteState(event: Event, isFavorite: Boolean) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val eventRef = database.child("users").child(userId).child("favoriteEvents").child(event.name)
+
+        if (isFavorite) {
+            eventRef.setValue(event) // ✅ Save full object
+        } else {
+            eventRef.removeValue() // ❌ Remove event object if unliked
+        }
+    }
+
+    // 🔹 Fetch full event object from Firebase
+    private fun fetchFavoriteEvent(eventName: String, callback: (Event?) -> Unit) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val eventRef = database.child("users").child(userId).child("favoriteEvents").child(eventName)
 
         eventRef.get().addOnSuccessListener { snapshot ->
-            callback(snapshot.exists()) // ✅ Returns true if event exists in Firebase
+            val event = snapshot.getValue(Event::class.java)
+            callback(event)
         }.addOnFailureListener {
-            callback(false) // ✅ If there's an error, return false
+            callback(null)
         }
     }
 }
