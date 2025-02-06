@@ -61,20 +61,20 @@ class LoginActivity : AppCompatActivity() {
         val user = FirebaseAuth.getInstance().currentUser
 
         if (user != null) {
+            val userId = user.uid
             val userData = mapOf(
-                "userId" to user.uid,
+                "userId" to userId,
                 "email" to user.email,
                 "username" to (user.displayName ?: user.email?.substringBefore("@")),
                 "profilePicUrl" to (user.photoUrl?.toString() ?: "https://www.example.com/default-profile.png"),
-                "favoriteGames" to emptyList<String>(),
-                "favoriteEvents" to emptyList<String>()
+                "favoriteGames" to mapOf<String, Boolean>(),  // 🔹 Empty Map to Store Favorites
+                "favoriteEvents" to mapOf<String, Boolean>()  // 🔹 Empty Map to Store Favorites
             )
 
-            database.child("users").child(user.uid).get().addOnSuccessListener { snapshot ->
+            database.child("users").child(userId).get().addOnSuccessListener { snapshot ->
                 if (!snapshot.exists()) {
-                    database.child("users").child(user.uid).setValue(userData)
+                    database.child("users").child(userId).setValue(userData)
                         .addOnSuccessListener {
-                            Toast.makeText(this, "User registered!", Toast.LENGTH_SHORT).show()
                             transactToNextScreen()
                         }
                         .addOnFailureListener {

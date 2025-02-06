@@ -2,7 +2,6 @@ package com.example.gamesphere_finalproject.adapters
 
 import android.animation.ObjectAnimator
 import android.content.Context
-import android.content.SharedPreferences
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -12,6 +11,8 @@ import com.example.gamesphere_finalproject.interfaces.GameCallback
 import com.example.gamesphere_finalproject.models.Game
 import com.example.gamesphere_finalproject.utilities.Constants
 import com.example.gamesphere_finalproject.utilities.ImageLoader
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
 import java.time.format.DateTimeFormatter
 import kotlin.math.max
 
@@ -19,14 +20,10 @@ class GameAdapter(private val games: List<Game>, private val context: Context) :
     RecyclerView.Adapter<GameAdapter.GameViewHolder>() {
 
     var gameCallback: GameCallback? = null
-
-    // Initialize SharedPreferences for favorite storage
-    private val sharedPreferences: SharedPreferences =
-        context.getSharedPreferences("game_favorites_prefs", Context.MODE_PRIVATE)
+    private val database: DatabaseReference = FirebaseDatabase.getInstance().reference
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GameViewHolder {
-        val binding = GameItemBinding
-            .inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = GameItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return GameViewHolder(binding)
     }
 
@@ -44,11 +41,13 @@ class GameAdapter(private val games: List<Game>, private val context: Context) :
                 binding.gameRBRating.rating = rating / 2
                 ImageLoader.getInstance().loadImage(poster, binding.gameIMGPoster)
 
-                // Load favorite state from SharedPreferences
-                isFavorite = sharedPreferences.getBoolean(name, false)
-                updateFavoriteIcon(isFavorite)
+                // 🔹 Fetch favorite state from Firebase
+                fetchFavoriteState(name) { isFav ->
+                    isFavorite = isFav
+                    updateFavoriteIcon(isFavorite)
+                }
 
-                // Expand/collapse animation
+                // 🔹 Expand/collapse animation
                 binding.gameCVData.setOnClickListener {
                     val animatorSet = ArrayList<ObjectAnimator>()
 
@@ -137,28 +136,47 @@ class GameAdapter(private val games: List<Game>, private val context: Context) :
                 val game = getItem(adapterPosition)
                 game.isFavorite = !game.isFavorite // Toggle favorite state
 
-                // Save favorite state in SharedPreferences
-                saveFavoriteState(game.name, game.isFavorite)
+                // 🔹 Save favorite state in Firebase
+                updateFavoriteState(game.name, game.isFavorite)
 
-                // Update UI
+                // 🔹 Update UI
                 updateFavoriteIcon(game.isFavorite)
                 notifyItemChanged(adapterPosition)
 
-                // Call callback if needed
+                // 🔹 Call callback if needed
                 gameCallback?.favoriteButtonClicked(game, adapterPosition)
             }
         }
     }
 
-    // Helper function to update the favorite icon
+    // 🔹 Helper function to update the favorite icon
     private fun GameViewHolder.updateFavoriteIcon(isFavorite: Boolean) {
         binding.gameIMGFavorite.setImageResource(
             if (isFavorite) R.drawable.heart else R.drawable.empty_heart
         )
     }
 
-    // Function to save favorite state in SharedPreferences
-    private fun saveFavoriteState(gameName: String, isFavorite: Boolean) {
-        sharedPreferences.edit().putBoolean(gameName, isFavorite).apply()
+    // 🔹 Function to save favorite state in Firebase
+    private fun updateFavoriteState(gameName: String, isFavorite: Boolean) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val gameRef = database.child("users").child(userId).child("favoriteGames").child(gameName)
+
+        if (isFavorite) {
+            gameRef.setValue(true) // ✅ Add to Firebase
+        } else {
+            gameRef.removeValue() // ✅ Remove from Firebase
+        }
+    }
+
+    // 🔹 Function to fetch favorite state from Firebase
+    private fun fetchFavoriteState(gameName: String, callback: (Boolean) -> Unit) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val gameRef = database.child("users").child(userId).child("favoriteGames").child(gameName)
+
+        gameRef.get().addOnSuccessListener { snapshot ->
+            callback(snapshot.exists()) // ✅ Returns true if game exists in Firebase
+        }.addOnFailureListener {
+            callback(false) // ✅ If there's an error, return false
+        }
     }
 }

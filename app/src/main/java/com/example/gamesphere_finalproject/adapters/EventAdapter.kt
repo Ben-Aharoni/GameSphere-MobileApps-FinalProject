@@ -2,7 +2,6 @@ package com.example.gamesphere_finalproject.adapters
 
 import android.animation.ObjectAnimator
 import android.content.Context
-import android.content.SharedPreferences
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -12,6 +11,8 @@ import com.example.gamesphere_finalproject.interfaces.EventCallback
 import com.example.gamesphere_finalproject.models.Event
 import com.example.gamesphere_finalproject.utilities.Constants
 import com.example.gamesphere_finalproject.utilities.ImageLoader
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
 import java.time.format.DateTimeFormatter
 import kotlin.math.max
 
@@ -19,14 +20,10 @@ class EventAdapter(private val events: List<Event>, private val context: Context
     RecyclerView.Adapter<EventAdapter.EventViewHolder>() {
 
     var eventCallback: EventCallback? = null
-
-    // Initialize SharedPreferences for favorite storage
-    private val sharedPreferences: SharedPreferences =
-        context.getSharedPreferences("event_favorites_prefs", Context.MODE_PRIVATE)
+    private val database: DatabaseReference = FirebaseDatabase.getInstance().reference
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EventViewHolder {
-        val binding = EventItemBinding
-            .inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = EventItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return EventViewHolder(binding)
     }
 
@@ -44,11 +41,13 @@ class EventAdapter(private val events: List<Event>, private val context: Context
                 binding.eventLBLLocation.text = location
                 ImageLoader.getInstance().loadImage(poster, binding.eventIMGPoster)
 
-                // Load favorite state from SharedPreferences
-                isFavorite = sharedPreferences.getBoolean(name, false)
-                updateFavoriteIcon(isFavorite)
+                // 🔹 Fetch favorite state from Firebase
+                fetchFavoriteState(name) { isFav ->
+                    isFavorite = isFav
+                    updateFavoriteIcon(isFavorite)
+                }
 
-                // Expand/collapse animation
+                // 🔹 Expand/collapse animation
                 binding.eventCVData.setOnClickListener {
                     val animatorSet = ArrayList<ObjectAnimator>()
 
@@ -159,28 +158,47 @@ class EventAdapter(private val events: List<Event>, private val context: Context
                 val event = getItem(adapterPosition)
                 event.isFavorite = !event.isFavorite // Toggle favorite state
 
-                // Save favorite state in SharedPreferences
-                saveFavoriteState(event.name, event.isFavorite)
+                // 🔹 Save favorite state in Firebase
+                updateFavoriteState(event.name, event.isFavorite)
 
-                // Update UI
+                // 🔹 Update UI
                 updateFavoriteIcon(event.isFavorite)
                 notifyItemChanged(adapterPosition)
 
-                // Call callback if needed
+                // 🔹 Call callback if needed
                 eventCallback?.favoriteButtonClicked(event, adapterPosition)
             }
         }
     }
 
-    // Helper function to update the favorite icon
+    // 🔹 Helper function to update the favorite icon
     private fun EventViewHolder.updateFavoriteIcon(isFavorite: Boolean) {
         binding.eventIMGFavorite.setImageResource(
             if (isFavorite) R.drawable.heart else R.drawable.empty_heart
         )
     }
 
-    // Function to save favorite state in SharedPreferences
-    private fun saveFavoriteState(eventName: String, isFavorite: Boolean) {
-        sharedPreferences.edit().putBoolean(eventName, isFavorite).apply()
+    // 🔹 Function to save favorite state in Firebase
+    private fun updateFavoriteState(eventName: String, isFavorite: Boolean) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val eventRef = database.child("users").child(userId).child("favoriteEvents").child(eventName)
+
+        if (isFavorite) {
+            eventRef.setValue(true) // ✅ Add to Firebase
+        } else {
+            eventRef.removeValue() // ✅ Remove from Firebase
+        }
+    }
+
+    // 🔹 Function to fetch favorite state from Firebase
+    private fun fetchFavoriteState(eventName: String, callback: (Boolean) -> Unit) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val eventRef = database.child("users").child(userId).child("favoriteEvents").child(eventName)
+
+        eventRef.get().addOnSuccessListener { snapshot ->
+            callback(snapshot.exists()) // ✅ Returns true if event exists in Firebase
+        }.addOnFailureListener {
+            callback(false) // ✅ If there's an error, return false
+        }
     }
 }
