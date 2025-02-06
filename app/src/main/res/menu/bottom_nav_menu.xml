@@ -16,4 +16,10 @@
         android:icon="@drawable/explore_icon"
         android:title="@string/title_notifications" />
 
+    <item
+        android:id="@+id/navigation_users"
+        android:icon="@drawable/users_icon"
+        android:title="@string/title_users" />
+
+
 </menu>

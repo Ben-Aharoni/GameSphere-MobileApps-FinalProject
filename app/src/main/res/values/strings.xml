@@ -4,4 +4,5 @@
     <string name="title_dashboard">Events</string>
     <string name="title_notifications">Explore</string>
     <string name="sign_out">Sign Out</string>
+    <string name="title_users">Users</string>
 </resources>
