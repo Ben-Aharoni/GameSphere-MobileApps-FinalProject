@@ -66,11 +66,11 @@ class FavoriteAdapter(private val favoriteItems: MutableList<FavoriteItem>) :
             binding.gameLBLGenres.text = game.genre.joinToString(", ")
             binding.gameLBLOverview.text = game.overview
             binding.gameLBLReleaseDate.text = game.releaseDate
-            binding.gameRBRating.rating = game.rating / 2  // ✅ Set correct rating
+            binding.gameRBRating.rating = game.rating / 2  // Set correct rating
             ImageLoader.getInstance()
-                .loadImage(game.poster, binding.gameIMGPoster)  // ✅ Load poster
+                .loadImage(game.poster, binding.gameIMGPoster)  // Load poster
 
-            // ✅ Set the heart icon correctly based on isFavorite
+            // Set the heart icon correctly based on isFavorite
             updateFavoriteIcon(game.isFavorite)
 
             binding.gameIMGFavorite.setOnClickListener {
@@ -89,10 +89,10 @@ class FavoriteAdapter(private val favoriteItems: MutableList<FavoriteItem>) :
                     database.child("users").child(uid).child("favoriteGames").child(game.name)
 
                 if (game.isFavorite) {
-                    gameRef.setValue(game) // ✅ Save full game object
+                    gameRef.setValue(game) // Save full game object
                 } else {
                     gameRef.removeValue().addOnSuccessListener {
-                        // ✅ Remove from list and update RecyclerView
+                        // Remove from list and update RecyclerView
                         val position =
                             favoriteItems.indexOfFirst { it is FavoriteItem.GameItem && it.game.name == game.name }
                         if (position != -1) {
@@ -145,7 +145,6 @@ class FavoriteAdapter(private val favoriteItems: MutableList<FavoriteItem>) :
         }
     }
 
-    // 🔹 Event ViewHolder
     inner class EventViewHolder(private val binding: EventItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(event: Event) {
@@ -157,7 +156,7 @@ class FavoriteAdapter(private val favoriteItems: MutableList<FavoriteItem>) :
             ImageLoader.getInstance()
                 .loadImage(event.poster, binding.eventIMGPoster)  // ✅ Load poster
 
-            // ✅ Set the heart icon correctly based on isFavorite
+            // Set the heart icon correctly based on isFavorite
             updateFavoriteIcon(event.isFavorite)
 
             binding.eventIMGFavorite.setOnClickListener {
@@ -176,10 +175,10 @@ class FavoriteAdapter(private val favoriteItems: MutableList<FavoriteItem>) :
                     database.child("users").child(uid).child("favoriteEvents").child(event.name)
 
                 if (event.isFavorite) {
-                    eventRef.setValue(event) // ✅ Save full event object
+                    eventRef.setValue(event) // Save full event object
                 } else {
                     eventRef.removeValue().addOnSuccessListener {
-                        // ✅ Remove from list and update RecyclerView
+                        // Remove from list and update RecyclerView
                         val position =
                             favoriteItems.indexOfFirst { it is FavoriteItem.EventItem && it.event.name == event.name }
                         if (position != -1) {

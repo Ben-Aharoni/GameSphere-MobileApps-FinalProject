@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.gamesphere_finalproject.adapters.EventAdapter
 import com.example.gamesphere_finalproject.databinding.FragmentDashboardBinding
 import com.example.gamesphere_finalproject.models.Event
-import com.example.gamesphere_finalproject.utilities.FirebaseUploader
 import com.google.firebase.database.*
 
 class DashboardFragment : Fragment() {

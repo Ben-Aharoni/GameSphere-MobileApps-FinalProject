@@ -13,7 +13,6 @@ import com.example.gamesphere_finalproject.utilities.Constants
 import com.example.gamesphere_finalproject.utilities.ImageLoader
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-import java.time.format.DateTimeFormatter
 import kotlin.math.max
 
 class GameAdapter(private val games: List<Game>, private val context: Context) :
@@ -34,9 +33,9 @@ class GameAdapter(private val games: List<Game>, private val context: Context) :
     override fun onBindViewHolder(holder: GameViewHolder, position: Int) {
         val game = getItem(position)
 
-        // Fetch full game object if it's in favorites
+        // Fetch full game object if its in favorites
         fetchFavoriteGame(game.name) { fetchedGame ->
-            val displayGame = fetchedGame ?: game  // Use full object if found, else use local
+            val displayGame = fetchedGame ?: game  // Use full object if found
             holder.bind(displayGame)
         }
     }
@@ -57,7 +56,7 @@ class GameAdapter(private val games: List<Game>, private val context: Context) :
                 updateFavoriteIcon(game.isFavorite)
             }
 
-            // Expand/collapse animation
+            // Expand or collapse animation
             binding.gameCVData.setOnClickListener {
                 toggleExpandCollapse(game)
             }
@@ -102,19 +101,19 @@ class GameAdapter(private val games: List<Game>, private val context: Context) :
         }
     }
 
-    // 🔹 Store or remove full game object in Firebase
+    // Store or remove full game object in Firebase
     private fun updateFavoriteState(game: Game, isFavorite: Boolean) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val gameRef = database.child("users").child(userId).child("favoriteGames").child(game.name)
 
         if (isFavorite) {
-            gameRef.setValue(game) // ✅ Save full object
+            gameRef.setValue(game) // Save full object
         } else {
-            gameRef.removeValue() // ❌ Remove game object if unliked
+            gameRef.removeValue() // Remove game object if unliked
         }
     }
 
-    // 🔹 Fetch full game object from Firebase
+    // Fetch full game object from Firebase
     private fun fetchFavoriteGame(gameName: String, callback: (Game?) -> Unit) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val gameRef = database.child("users").child(userId).child("favoriteGames").child(gameName)

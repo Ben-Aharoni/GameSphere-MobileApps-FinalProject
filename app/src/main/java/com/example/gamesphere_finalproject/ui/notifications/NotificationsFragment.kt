@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.gamesphere_finalproject.adapters.GameAdapter
 import com.example.gamesphere_finalproject.databinding.FragmentNotificationsBinding
 import com.example.gamesphere_finalproject.models.Game
-import com.example.gamesphere_finalproject.utilities.FirebaseGameUploader
 import com.google.firebase.database.*
 
 class NotificationsFragment : Fragment() {

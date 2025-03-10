@@ -6,7 +6,6 @@
     android:padding="12dp"
     android:layoutDirection="ltr">
 
-    <!-- User Profile Picture (Moved to Center Left) -->
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/userIMGProfile"
         android:layout_width="70dp"
@@ -17,9 +16,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="@id/userCardFavorites"
-        app:layout_constraintVertical_bias="0.5" />  <!-- Centers vertically -->
+        app:layout_constraintVertical_bias="0.5" />
 
-    <!-- CardView for User Info & Favorites -->
     <androidx.cardview.widget.CardView
         android:id="@+id/userCardFavorites"
         android:layout_width="0dp"
@@ -40,7 +38,6 @@
             android:orientation="vertical"
             android:padding="12dp">
 
-            <!-- Username -->
             <TextView
                 android:id="@+id/userLBLUsername"
                 android:layout_width="wrap_content"
@@ -50,7 +47,6 @@
                 android:textStyle="bold"
                 android:layout_marginBottom="4dp"/>
 
-            <!-- Favorite Games & Events -->
             <TextView
                 android:id="@+id/userLBLFavorites"
                 android:layout_width="wrap_content"

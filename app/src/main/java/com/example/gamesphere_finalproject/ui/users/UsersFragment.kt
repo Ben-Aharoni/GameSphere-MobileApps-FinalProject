@@ -48,13 +48,13 @@ class UsersFragment : Fragment() {
                     val username = userSnapshot.child("username").getValue(String::class.java) ?: "Unknown User"
                     val profilePicUrl = userSnapshot.child("profilePicUrl").getValue(String::class.java) ?: ""
 
-                    // ✅ Extract only the names of favorite games
+                    // Extract only the names of favorite games
                     val favoriteGames = userSnapshot.child("favoriteGames").children.mapNotNull { it.key }
 
-                    // ✅ Extract only the names of favorite events
+                    // Extract only the names of favorite events
                     val favoriteEvents = userSnapshot.child("favoriteEvents").children.mapNotNull { it.key }
 
-                    // ✅ Create a new user object with extracted data
+                    // Create a new user object with extracted data
                     val user = User(userId, username, profilePicUrl, favoriteGames, favoriteEvents)
 
                     usersList.add(user)

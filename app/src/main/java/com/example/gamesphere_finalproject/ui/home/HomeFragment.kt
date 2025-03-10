@@ -80,13 +80,13 @@ class HomeFragment : Fragment() {
 
         favoriteItems.clear()
 
-        // 🔹 Load favorite games (full objects)
+        // Load favorite games (full objects)
         database.child("users").child(userId).child("favoriteGames").addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 for (gameSnapshot in snapshot.children) {
-                    val game = gameSnapshot.getValue(Game::class.java) // ✅ Get full game object
+                    val game = gameSnapshot.getValue(Game::class.java) // Get full game object
                     if (game != null) {
-                        favoriteItems.add(FavoriteItem.GameItem(game)) // ✅ Store full object
+                        favoriteItems.add(FavoriteItem.GameItem(game)) // Store full object
                     }
                 }
                 favoriteAdapter.notifyDataSetChanged()
@@ -94,13 +94,13 @@ class HomeFragment : Fragment() {
             override fun onCancelled(error: DatabaseError) {}
         })
 
-        // 🔹 Load favorite events (full objects)
+        // Load favorite events (full objects)
         database.child("users").child(userId).child("favoriteEvents").addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 for (eventSnapshot in snapshot.children) {
-                    val event = eventSnapshot.getValue(Event::class.java) // ✅ Get full event object
+                    val event = eventSnapshot.getValue(Event::class.java) // Get full event object
                     if (event != null) {
-                        favoriteItems.add(FavoriteItem.EventItem(event)) // ✅ Store full object
+                        favoriteItems.add(FavoriteItem.EventItem(event)) // Store full object
                     }
                 }
                 favoriteAdapter.notifyDataSetChanged()

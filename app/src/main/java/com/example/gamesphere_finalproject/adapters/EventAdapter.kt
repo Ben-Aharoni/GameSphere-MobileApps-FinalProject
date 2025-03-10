@@ -13,7 +13,6 @@ import com.example.gamesphere_finalproject.utilities.Constants
 import com.example.gamesphere_finalproject.utilities.ImageLoader
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-import java.time.format.DateTimeFormatter
 import kotlin.math.max
 
 class EventAdapter(private val events: List<Event>, private val context: Context) :
@@ -112,9 +111,9 @@ class EventAdapter(private val events: List<Event>, private val context: Context
         val eventRef = database.child("users").child(userId).child("favoriteEvents").child(event.name)
 
         if (isFavorite) {
-            eventRef.setValue(event) // ✅ Save full object
+            eventRef.setValue(event) // Save full object
         } else {
-            eventRef.removeValue() // ❌ Remove event object if unliked
+            eventRef.removeValue() // Remove event object if unliked
         }
     }
 

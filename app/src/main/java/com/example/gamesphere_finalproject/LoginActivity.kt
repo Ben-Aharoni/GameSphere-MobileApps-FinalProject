@@ -66,7 +66,7 @@ class LoginActivity : AppCompatActivity() {
             val userData = mapOf(
                 "userId" to user.uid,
                 "email" to user.email,
-                "username" to username, // ✅ Ensure username is stored
+                "username" to username, // Ensure username is stored
                 "profilePicUrl" to (user.photoUrl?.toString() ?: "https://www.example.com/default-profile.png"),
                 "favoriteGames" to emptyMap<String, Boolean>(),
                 "favoriteEvents" to emptyMap<String, Boolean>()
