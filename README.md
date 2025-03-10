@@ -28,7 +28,7 @@
 
 
 ### How To Install
-1. Clone the repository: https://github.com/Ben-Aharoni/Mobile-Apps-A1.git
+1. Clone the repository: https://github.com/Ben-Aharoni/GameSphere-MobileApps-FinalProject.git
 2. Open a new project in Android Studio.
 4. Sync the project with Gradle.
 5. Run the application on an emulator or physical device.
