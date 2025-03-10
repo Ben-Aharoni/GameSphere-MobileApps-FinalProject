@@ -1,30 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layoutDirection="ltr"
-    android:padding="10dp">
+    android:padding="12dp"
+    android:layoutDirection="ltr">
 
+    <!-- User Profile Picture (Moved to Center Left) -->
     <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/userProfileImage"
+        android:id="@+id/userIMGProfile"
         android:layout_width="70dp"
         android:layout_height="70dp"
-        app:civ_border_width="2dp"
-        app:civ_border_color="@android:color/black"
         android:src="@drawable/worldwide"
+        app:civ_border_width="2dp"
+        app:civ_border_color="@color/black"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/userCardFavorites"
+        app:layout_constraintVertical_bias="0.5" />  <!-- Centers vertically -->
 
-    <TextView
-        android:id="@+id/userName"
-        android:layout_width="wrap_content"
+    <!-- CardView for User Info & Favorites -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/userCardFavorites"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Username"
-        android:textStyle="bold"
-        android:textSize="18sp"
-        app:layout_constraintStart_toEndOf="@id/userProfileImage"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintStart_toEndOf="@id/userIMGProfile"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <!-- Username -->
+            <TextView
+                android:id="@+id/userLBLUsername"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Username"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="4dp"/>
+
+            <!-- Favorite Games & Events -->
+            <TextView
+                android:id="@+id/userLBLFavorites"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🎮 Games:\n🎟️ Events:"
+                android:textSize="14sp"
+                android:textColor="@android:color/darker_gray"
+                android:textStyle="bold"/>
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

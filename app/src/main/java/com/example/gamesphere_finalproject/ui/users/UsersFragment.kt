@@ -15,10 +15,9 @@ class UsersFragment : Fragment() {
 
     private var _binding: FragmentUsersBinding? = null
     private val binding get() = _binding!!
-
     private lateinit var database: DatabaseReference
-    private val userList = mutableListOf<User>()
     private lateinit var userAdapter: UserAdapter
+    private val usersList = mutableListOf<User>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,19 +34,30 @@ class UsersFragment : Fragment() {
 
     private fun setupRecyclerView() {
         binding.usersRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        userAdapter = UserAdapter(userList)
+        userAdapter = UserAdapter(usersList)
         binding.usersRecyclerView.adapter = userAdapter
     }
 
     private fun loadUsers() {
         database.child("users").addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                userList.clear()
+                usersList.clear()
+
                 for (userSnapshot in snapshot.children) {
-                    val user = userSnapshot.getValue(User::class.java)
-                    if (user != null) {
-                        userList.add(user)
-                    }
+                    val userId = userSnapshot.child("userId").getValue(String::class.java) ?: ""
+                    val username = userSnapshot.child("username").getValue(String::class.java) ?: "Unknown User"
+                    val profilePicUrl = userSnapshot.child("profilePicUrl").getValue(String::class.java) ?: ""
+
+                    // ✅ Extract only the names of favorite games
+                    val favoriteGames = userSnapshot.child("favoriteGames").children.mapNotNull { it.key }
+
+                    // ✅ Extract only the names of favorite events
+                    val favoriteEvents = userSnapshot.child("favoriteEvents").children.mapNotNull { it.key }
+
+                    // ✅ Create a new user object with extracted data
+                    val user = User(userId, username, profilePicUrl, favoriteGames, favoriteEvents)
+
+                    usersList.add(user)
                 }
                 userAdapter.notifyDataSetChanged()
             }
