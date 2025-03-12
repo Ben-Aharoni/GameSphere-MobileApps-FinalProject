@@ -58,7 +58,7 @@ class FavoriteAdapter(private val favoriteItems: MutableList<FavoriteItem>) :
         }
     }
 
-    // 🔹 Game ViewHolder
+    
     inner class GameViewHolder(private val binding: GameItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(game: Game) {
@@ -154,7 +154,7 @@ class FavoriteAdapter(private val favoriteItems: MutableList<FavoriteItem>) :
             binding.eventLBLReleaseDate.text = event.releaseDate
             binding.eventLBLLocation.text = event.location
             ImageLoader.getInstance()
-                .loadImage(event.poster, binding.eventIMGPoster)  // ✅ Load poster
+                .loadImage(event.poster, binding.eventIMGPoster)  // Load poster
 
             // Set the heart icon correctly based on isFavorite
             updateFavoriteIcon(event.isFavorite)
