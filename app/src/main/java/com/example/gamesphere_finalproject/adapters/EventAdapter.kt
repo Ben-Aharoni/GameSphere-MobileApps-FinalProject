@@ -105,7 +105,7 @@ class EventAdapter(private val events: List<Event>, private val context: Context
         }
     }
 
-    // 🔹 Store or remove full event object in Firebase
+    // Store or remove full event object in Firebase
     private fun updateFavoriteState(event: Event, isFavorite: Boolean) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val eventRef = database.child("users").child(userId).child("favoriteEvents").child(event.name)
@@ -117,7 +117,7 @@ class EventAdapter(private val events: List<Event>, private val context: Context
         }
     }
 
-    // 🔹 Fetch full event object from Firebase
+    // Fetch full event object from Firebase
     private fun fetchFavoriteEvent(eventName: String, callback: (Event?) -> Unit) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val eventRef = database.child("users").child(userId).child("favoriteEvents").child(eventName)
